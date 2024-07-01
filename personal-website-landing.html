@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Name - Data Science Enthusiast</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1a1a2e;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .content {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .tagline {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .age-counter {
+            font-size: 1em;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .age-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .age-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .age-label {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        .description {
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .social-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+        .social-links a:hover {
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="content">
+        <h1>Your Name</h1>
+        <p class="tagline">Data Science Explorer | Pattern Seeker | Future Innovator</p>
+        <div class="age-counter" id="age-counter"></div>
+        <p class="description">
+            Diving deep into the ocean of data, I'm on a quest to uncover hidden patterns and transform raw information into actionable insights. With each line of code and every dataset, I'm not just studying data science – I'm living it. My journey is about pushing boundaries, embracing challenges, and dreaming of a future where data drives positive change in our world.
+        </p>
+        <div class="social-links">
+            <a href="#" target="_blank">LinkedIn</a>
+            <a href="#" target="_blank">GitHub</a>
+            <a href="#" target="_blank">Twitter</a>
+        </div>
+    </div>
+
+    <script>
+        // Interactive Mouse Trail Background
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const properties = {
+            bgColor             : 'rgba(26, 26, 46, 0.05)',
+            particleColor       : 'rgba(0, 255, 255, 0.7)',
+            particleRadius      : 3,
+            particleCount       : 70,
+            particleMaxVelocity : 0.5,
+            lineLength          : 150,
+            particleLife        : 6,
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.velocityX = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                this.velocityY = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                this.life = Math.random() * properties.particleLife * 60;
+            }
+            
+            position() {
+                this.x + this.velocityX > canvas.width && this.velocityX > 0 || this.x + this.velocityX < 0 && this.velocityX < 0 ? this.velocityX *= -1 : this.velocityX;
+                this.y + this.velocityY > canvas.height && this.velocityY > 0 || this.y + this.velocityY < 0 && this.velocityY < 0 ? this.velocityY *= -1 : this.velocityY;
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+            }
+            
+            reDraw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, properties.particleRadius, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fillStyle = properties.particleColor;
+                ctx.fill();
+            }
+            
+            reCalculateLife() {
+                if(this.life < 1) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.velocityX = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                    this.velocityY = Math.random() * (properties.particleMaxVelocity * 2) - properties.particleMaxVelocity;
+                    this.life = Math.random() * properties.particleLife * 60;
+                }
+                this.life--;
+            }
+        }
+
+        function reDrawBackground() {
+            ctx.fillStyle = properties.bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawLines() {
+            let x1, y1, x2, y2, length, opacity;
+            for(let i in particles) {
+                for(let j in particles) {
+                    x1 = particles[i].x;
+                    y1 = particles[i].y;
+                    x2 = particles[j].x;
+                    y2 = particles[j].y;
+                    length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                    if(length < properties.lineLength) {
+                        opacity = 1 - length / properties.lineLength;
+                        ctx.lineWidth = '0.5';
+                        ctx.strokeStyle = `rgba(0, 255, 255, ${opacity})`;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function reDrawParticles() {
+            for(let i in particles) {
+                particles[i].reCalculateLife();
+                particles[i].position();
+                particles[i].reDraw();
+            }
+        }
+
+        function loop() {
+            reDrawBackground();
+            reDrawParticles();
+            drawLines();
+            requestAnimationFrame(loop);
+        }
+
+        function init() {
+            for(let i = 0; i < properties.particleCount; i++){
+                particles.push(new Particle);
+            }
+            loop();
+        }
+
+        init();
+
+        // Mouse interaction
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 100
+        }
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        // Updated Age counter
+        function updateAgeCounter() {
+            const birthday = new Date('2001-09-10T00:00:00');
+            const now = new Date();
+            const diffTime = Math.abs(now - birthday);
+            
+            const years = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
+            let remainingTime = diffTime % (1000 * 60 * 60 * 24 * 365.25);
+            
+            const months = Math.floor(remainingTime / (1000 * 60 * 60 * 24 * 30.44));
+            remainingTime %= (1000 * 60 * 60 * 24 * 30.44);
+            
+            const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+            remainingTime %= (1000 * 60 * 60 * 24);
+            
+            const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+            remainingTime %= (1000 * 60 * 60);
+            
+            const minutes = Math.floor(remainingTime / (1000 * 60));
+            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+            const ageCounter = document.getElementById('age-counter');
+            ageCounter.innerHTML = `
+                <div class="age-unit"><span class="age-value">${years}</span><span class="age-label">years</span></div>
+                <div class="age-unit"><span class="age-value">${months}</span><span class="age-label">months</span></div>
+                <div class="age-unit"><span class="age-value">${days}</span><span class="age-label">days</span></div>
+                <div class="age-unit"><span class="age-value">${hours}</span><span class="age-label">hours</span></div>
+                <div class="age-unit"><span class="age-value">${minutes}</span><span class="age-label">minutes</span></div>
+                <div class="age-unit"><span class="age-value">${seconds}</span><span class="age-label">seconds</span></div>
+            `;
+        }
+        setInterval(updateAgeCounter, 1000);
+        updateAgeCounter();
+
+        // Resize handler
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
